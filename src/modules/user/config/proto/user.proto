@@ -4,7 +4,10 @@ package user;
 service User {
     rpc LoginUser(LoginUserRequest) returns (LoginUserResponse);
     rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
-    
+    rpc SignupOtp(SignupOtpRequest) returns (SignupOtpResponse);
+    rpc ResendOtp(SignupOtpRequest) returns (SignupOtpResponse);
+    rpc AdminLogin(LoginUserRequest) returns (LoginAdminRespone);
+    rpc GoogleLoginUser(GoogleLoginUserRequest) returns (GoogleLoginUserResponse);
 }
 message LoginUserRequest {
     string email = 1;
@@ -26,6 +29,7 @@ message RegisterUserRequest {
     string mobile = 3;
     string password = 4;
     string userImage = 5;
+    string otp = 6;
 }
 
 message RegisterUserResponse {
@@ -35,4 +39,32 @@ message RegisterUserResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+}
+
+message LoginAdminRespone {
+    string message = 1;
+    string name = 2;
+    string token = 3;
+}
+
+message GoogleLoginUserRequest {
+    string email = 1;
+}
+
+message GoogleLoginUserResponse {
+    string message = 1;
+    string name = 2;
+    string token = 3;
+    string _id = 4;
+    string refreshToken = 5;
+    string image = 6;
+}
+
+message SignupOtpRequest {
+    string email = 1;
+    string name = 2;
+}
+
+message SignupOtpResponse {
+    string message = 1;
 }

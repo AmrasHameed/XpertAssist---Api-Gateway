@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package auth;
+
+service Auth{
+  rpc RefreshToken(RefreshReq) returns(RefreshRes) {};
+}
+
+message RefreshReq{
+  string token = 1;
+}
+
+message RefreshRes{
+  string access_token = 1;
+  string refresh_token = 2;
+}
+

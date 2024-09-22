@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { AuthResponse } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
-import { UserService } from './config/gRPC-client/user.client';
 import uploadToS3 from '../../services/s3';
+import { ExpertService } from './config/gRPC-client/auth.expert';
 
-export default class userController {
-  loginUser = (req: Request, res: Response) => {
+export default class expertController {
+  loginExpert = (req: Request, res: Response) => {
     try {
-      UserService.LoginUser(req.body, (err: any, result: AuthResponse) => {
+      ExpertService.LoginExpert(req.body, (err: any, result: AuthResponse) => {
         if (err) {
           res.status(StatusCode.BadRequest).json({ message: err });
         } else {
@@ -22,9 +22,9 @@ export default class userController {
     }
   };
 
-  signupOtp = async (req: Request, res: Response) => {
+  expertSignupOtp = async (req: Request, res: Response) => {
     try {
-      UserService.SignupOtp(
+      ExpertService.ExpertSignupOtp(
         req.body,
         (err: any, result: { message: string }) => {
           if (err) {
@@ -40,11 +40,11 @@ export default class userController {
         .status(StatusCode.InternalServerError)
         .json({ message: 'Internal Server Error' });
     }
-  };
+  }
 
-  resendOtp = async (req: Request, res: Response) => {
+  expertResendOtp = async (req: Request, res: Response) => {
     try {
-      UserService.ResendOtp(
+      ExpertService.ExpertResendOtp(
         req.body,
         (err: any, result: { message: string }) => {
           if (err) {
@@ -60,17 +60,17 @@ export default class userController {
         .status(StatusCode.InternalServerError)
         .json({ message: 'Internal Server Error' });
     }
-  };
+  }
 
-  registerUser = async (req: Request, res: Response) => {
+  registerExpert = async(req: Request, res: Response) => {
     try {
       const files: Express.Multer.File | undefined = req.file;
-      let userImage = '';
+      let expertImage = '';
       if (files) {
-        userImage = await uploadToS3(files);
+        expertImage = await uploadToS3(files);
       }
-      UserService.RegisterUser(
-        { ...req.body,userImage },
+      ExpertService.RegisterExpert(
+        { ...req.body, expertImage },
         (err: any, result: AuthResponse) => {
           if (err) {
             res.status(StatusCode.BadRequest).json({ message: err });
@@ -87,9 +87,9 @@ export default class userController {
     }
   };
 
-  googleLoginUser = (req: Request, res: Response) => {
+  googleLoginExpert = (req: Request, res: Response) => {
     try {
-      UserService.GoogleLoginUser(
+      ExpertService.GoogleLoginExpert(
         req.body,
         (err: any, result: AuthResponse) => {
           if (err) {

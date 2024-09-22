@@ -8,6 +8,9 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import { limiter } from "./utils/rateLimit";
 import userRoute from "./modules/user/route";
+import authRoute from "./modules/auth/route";
+import adminRoute from "./modules/admin/route";
+import expertRoute from "./modules/expert/route";
 
 
 class App {
@@ -37,6 +40,9 @@ class App {
 
     private routes():void{
         this.app.use('/api/user',userRoute)
+        this.app.use('/api/auth',authRoute)
+        this.app.use('/api/admin',adminRoute)
+        this.app.use('/api/expert',expertRoute)
     }
 
 
