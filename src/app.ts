@@ -35,6 +35,7 @@ class App {
         this.app.use(compression());
         this.app.use(helmet());
         this.app.use(cookieParser());
+        this.app.use(express.urlencoded({ extended: true }));
         this.app.use(limiter)
     }
 

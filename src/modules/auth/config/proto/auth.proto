@@ -4,6 +4,7 @@ package auth;
 
 service Auth{
   rpc RefreshToken(RefreshReq) returns(RefreshRes) {};
+  rpc IsAuthenticated(AuthReq) returns(AuthRes) {};
 }
 
 message RefreshReq{
@@ -15,3 +16,11 @@ message RefreshRes{
   string refresh_token = 2;
 }
 
+message AuthReq {
+  string token = 1;
+}
+
+message AuthRes {
+  string user_id = 1;
+  string role = 2;
+}

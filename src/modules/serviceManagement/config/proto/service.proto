@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package service;
+
+service Service {
+  rpc AddService(AddServiceRequest) returns (AddServiceResponse);
+  rpc GetServices(Empty) returns (GetServicesResponse); 
+  rpc GetService(GetServiceRequest) returns (ServiceMessage); 
+  rpc UpdateService(UpdateServiceRequest) returns (AddServiceResponse); 
+  rpc DeleteService(GetServiceRequest) returns (AddServiceResponse);
+}
+
+message Empty {}
+
+message GetServiceRequest {
+  string id = 1;
+}
+
+message AddServiceRequest {
+  string name = 1;
+  string description = 2;
+  int64 price = 3;
+  string serviceImage = 4;
+}
+
+message UpdateServiceRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int64 price = 4;
+  string serviceImage = 5;
+}
+
+message AddServiceResponse {
+  string message = 1;
+}
+
+message ServiceMessage {
+  string _id = 1;
+  string name = 2;
+  string description = 3;
+  int64 price = 4;
+  string serviceImage = 5;
+}
+
+
+message GetServicesResponse {
+  repeated ServiceMessage services = 1; 
+}

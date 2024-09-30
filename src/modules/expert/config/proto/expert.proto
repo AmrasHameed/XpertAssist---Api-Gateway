@@ -7,10 +7,40 @@ service Expert {
     rpc ExpertResendOtp(ExpertSignupOtpRequest) returns (ExpertSignupOtpResponse);
     rpc RegisterExpert(RegisterExpertRequest) returns (RegisterExpertResponse);
     rpc GoogleLoginExpert(GoogleLoginExpertRequest) returns (GoogleLoginExpertResponse);
+    rpc GetExpert(GetExpertRequest) returns (GetExpertResponse);
+    rpc UpdateExpert(UpdateExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc ChangePassword(ChangePasswordRequest) returns (ExpertSignupOtpResponse);
 }
+
+message ChangePasswordRequest {
+    string id = 1;
+    string currentPassword = 2;
+    string newPassword = 3;
+}
+
+message UpdateExpertRequest {
+    string id = 1;
+    string name = 2;
+    string mobile = 3;
+    string expertImage = 4;
+}
+
+message GetExpertRequest {
+    string id = 1;
+}
+
 message LoginExpertRequest {
     string email = 1;
     string password = 2;
+}
+
+message GetExpertResponse {
+    string message = 1;
+    string _id = 2;
+    string name = 3;
+    string email = 4;
+    string mobile = 5;
+    string expertImage = 6;
 }
 
 message LoginExpertResponse {
@@ -20,6 +50,10 @@ message LoginExpertResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string service = 7;
+    string email = 8;
+    string mobile = 9;
+    string isVerified = 10;
 }
 
 message RegisterExpertRequest {
@@ -29,6 +63,7 @@ message RegisterExpertRequest {
     string password = 4;
     string expertImage = 5;
     string otp = 6;
+    string service = 7;
 }
 
 message RegisterExpertResponse {
@@ -38,6 +73,10 @@ message RegisterExpertResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string service = 7;
+    string email = 8;
+    string mobile = 9;
+    string isVerified = 10;
 }
 
 message GoogleLoginExpertRequest {
@@ -51,6 +90,10 @@ message GoogleLoginExpertResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string service = 7;
+    string email = 8;
+    string mobile = 9;
+    string isVerified = 10;
 }
 
 message ExpertSignupOtpRequest {

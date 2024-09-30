@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthResponse } from '../../interfaces/interface';
+import { AuthResponse, Expert } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import uploadToS3 from '../../services/s3';
 import { ExpertService } from './config/gRPC-client/auth.expert';
@@ -96,7 +96,6 @@ export default class expertController {
             console.log(err);
             res.status(StatusCode.BadRequest).json({ message: err });
           } else {
-            console.log('result ', result);
             res.status(StatusCode.Created).json(result);
           }
         }
@@ -106,6 +105,66 @@ export default class expertController {
       return res
         .status(StatusCode.InternalServerError)
         .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getExpert = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ExpertService.GetExpert({id}, (err: any, result: { expert: Expert}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  updateExpert  = async (req: Request, res: Response) => {
+    try {
+      const files: Express.Multer.File | undefined = req.file;
+      let expertImage = '';
+      if (files) {
+        expertImage = await uploadToS3(files);
+      }
+      const {id} = req.params
+      ExpertService.UpdateExpert({...req.body,expertImage, id}, (err: any, result: {message:string}) => {
+        if (err) {
+          res.status(StatusCode.BadRequest).json({ message: err });
+        } else {
+          res.status(StatusCode.Created).json(result);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  changePassword = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      const {currentPassword, newPassword} = req.body
+      ExpertService.ChangePassword({id, currentPassword, newPassword}, (err: any, result: { message: string}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
     }
   };
 }
