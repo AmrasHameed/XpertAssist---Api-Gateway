@@ -15,6 +15,9 @@ expertRoute.post('/googleLoginExpert',controller.googleLoginExpert);
 expertRoute.get('/getExpert/:id',isValidated, controller.getExpert);
 expertRoute.post('/updateExpert/:id',isValidated, upload.single('expertImage'), controller.updateExpert);
 expertRoute.post('/changePassword/:id', isValidated, controller.changePassword)
+expertRoute.post('/verifyExpert/:id', isValidated,upload.single('document'), controller.verifyExpert)
+expertRoute.get('/isBlocked/:id', controller.isBlocked)
+
 
 
 export default expertRoute

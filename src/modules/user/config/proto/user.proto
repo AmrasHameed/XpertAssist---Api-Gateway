@@ -11,6 +11,7 @@ service User {
     rpc GetUser(GetUserRequest) returns (GetUserResponse);
     rpc UpdateUser(UpdateUserRequest) returns (SignupOtpResponse);
     rpc ChangePassword(ChangePasswordRequest) returns (SignupOtpResponse);
+    rpc IsBlocked(GetUserRequest) returns (SignupOtpResponse);
 }
 
 message ChangePasswordRequest {

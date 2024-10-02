@@ -30,12 +30,24 @@ export interface User {
 
 export interface Expert {
   message: string;
-  id: string;
+  id: string;              
   name: string;
   email: string;
   mobile: number;
   expertImage: string;
+  service?: string;
+  password?: string;
+  accountStatus?: string;   
+  isVerified?: string;      
+  verificationDetails?: {
+    govIdType?: string;
+    govIdNumber?: string;
+    document?: string;
+  };
+  createdAt?: Date;        
+  updatedAt?: Date;
 }
+
 
 
 export interface AdminAuthResponse {

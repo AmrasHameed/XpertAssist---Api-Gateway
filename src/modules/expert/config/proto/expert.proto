@@ -10,6 +10,60 @@ service Expert {
     rpc GetExpert(GetExpertRequest) returns (GetExpertResponse);
     rpc UpdateExpert(UpdateExpertRequest) returns (ExpertSignupOtpResponse);
     rpc ChangePassword(ChangePasswordRequest) returns (ExpertSignupOtpResponse);
+    rpc VerifyExpert(VerifyExpertRequest) returns (VerifyExpertResponse);
+    rpc GetExperts(Empty) returns (GetExpertsResponse);
+    rpc ExpertVerification(ExpertVerificationRequest) returns (ExpertSignupOtpResponse);
+    rpc BlockExpert(BlockExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc IsBlocked(GetExpertRequest) returns (ExpertSignupOtpResponse);
+}
+
+message BlockExpertRequest {
+    string id = 1;
+    string accountStatus = 2;
+}
+
+message ExpertVerificationRequest {
+    string id = 1;
+    string action = 2;
+    string reason = 3;
+}
+
+message Empty {}
+
+message ExpertMessage {
+    string _id = 1;                 
+    string name = 2;                
+    string email = 3;               
+    int64 mobile = 4;               
+    string service = 5;           
+    string expertImage = 6;         
+    string accountStatus = 7;      
+    string isVerified = 8;          
+    VerificationDetails verificationDetails = 9; 
+    string createdAt = 10;        
+    string updatedAt = 11;          
+  }
+  
+  message VerificationDetails {
+    string govIdType = 1;          
+    string govIdNumber = 2;        
+    string document = 3;            
+  }
+
+message GetExpertsResponse {
+    repeated ExpertMessage experts = 1; 
+}
+
+message VerifyExpertRequest {
+    string id = 1;
+    string govIdType = 2;
+    string govIdNumber = 3;
+    string verifyDocument = 4;
+}
+
+message VerifyExpertResponse {
+    string message = 1;
+    string isVerified = 2;
 }
 
 message ChangePasswordRequest {
@@ -35,12 +89,18 @@ message LoginExpertRequest {
 }
 
 message GetExpertResponse {
-    string message = 1;
-    string _id = 2;
-    string name = 3;
-    string email = 4;
-    string mobile = 5;
-    string expertImage = 6;
+    string message = 1;                
+    string _id = 2;                     
+    string name = 3;                    
+    string email = 4;                   
+    int64 mobile = 5;                   
+    string service = 6;                 
+    string expertImage = 7;             
+    string accountStatus = 8;           
+    string isVerified = 9;              
+    VerificationDetails verificationDetails = 10;  
+    string createdAt = 11;              
+    string updatedAt = 12;              
 }
 
 message LoginExpertResponse {

@@ -187,4 +187,22 @@ export default class userController {
       return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
     }
   };
+
+  isBlocked = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      UserService.IsBlocked({id}, (err: any, result: { message: string}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
 }
