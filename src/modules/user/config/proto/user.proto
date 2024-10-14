@@ -9,10 +9,50 @@ service User {
     rpc AdminLogin(LoginUserRequest) returns (LoginAdminRespone);
     rpc GoogleLoginUser(GoogleLoginUserRequest) returns (GoogleLoginUserResponse);
     rpc GetUser(GetUserRequest) returns (GetUserResponse);
-    rpc UpdateUser(UpdateUserRequest) returns (SignupOtpResponse);
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
     rpc ChangePassword(ChangePasswordRequest) returns (SignupOtpResponse);
     rpc IsBlocked(GetUserRequest) returns (SignupOtpResponse);
+    rpc GetUsers(Empty) returns (GetUsersResponse);
+    rpc BlockUser(BlockUserRequest) returns (SignupOtpResponse);
+    rpc ForgotPassOtp(GoogleLoginUserRequest) returns (SignupOtpResponse);
+    rpc OtpVerify(OtpVerifyRequest) returns (SignupOtpResponse);
+    rpc UpdatePassword(LoginUserRequest) returns (SignupOtpResponse);
 }
+
+message OtpVerifyRequest {
+    string otp = 2;
+    string email = 1;
+}
+
+message UpdateUserResponse {
+    string message = 1;
+    string name = 2;
+    string mobile = 3;
+    string userImage = 4; 
+}
+
+message BlockUserRequest {
+    string id = 1;
+    string accountStatus = 2;
+}
+
+message GetUsersResponse {
+    repeated UserMessage users = 1;
+}
+
+message UserMessage {
+    string _id = 1;                 
+    string name = 2;                
+    string email = 3;               
+    int64  mobile = 4;                       
+    string userImage = 5;         
+    string accountStatus = 6;      
+    string createdAt = 7;        
+    string updatedAt = 8;  
+}
+
+
+message Empty {}
 
 message ChangePasswordRequest {
     string id = 1;
@@ -52,6 +92,8 @@ message LoginUserResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string email = 7;
+    string mobile = 8;
 }
 
 message RegisterUserRequest {
@@ -70,6 +112,8 @@ message RegisterUserResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string email = 7;
+    string mobile = 8;
 }
 
 message LoginAdminRespone {
@@ -89,6 +133,8 @@ message GoogleLoginUserResponse {
     string _id = 4;
     string refreshToken = 5;
     string image = 6;
+    string email = 7;
+    string mobile = 8;
 }
 
 message SignupOtpRequest {

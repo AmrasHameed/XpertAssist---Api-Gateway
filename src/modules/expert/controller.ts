@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { AuthResponse, Expert } from '../../interfaces/interface';
+import { AuthResponse, Expert, Service, UpdateExpert } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import uploadToS3 from '../../services/s3';
 import { ExpertService } from './config/gRPC-client/auth.expert';
+import { ServiceManagement } from '../serviceManagement/config/gRPC-client/service.client';
 
 export default class expertController {
   loginExpert = (req: Request, res: Response) => {
@@ -61,6 +62,66 @@ export default class expertController {
         .json({ message: 'Internal Server Error' });
     }
   }
+
+  forgotPassOtp = async (req: Request, res: Response) => {
+    try {
+      ExpertService.ForgotPassOtp(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  otpVerify = async (req: Request, res: Response) => {
+    try {
+      ExpertService.OtpVerify(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  updatePassword = async (req: Request, res: Response) => {
+    try {
+      ExpertService.UpdatePassword(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
 
   registerExpert = async(req: Request, res: Response) => {
     try {
@@ -135,7 +196,7 @@ export default class expertController {
         expertImage = await uploadToS3(files);
       }
       const {id} = req.params
-      ExpertService.UpdateExpert({...req.body,expertImage, id}, (err: any, result: {message:string}) => {
+      ExpertService.UpdateExpert({...req.body,expertImage, id}, (err: any, result: {expert: UpdateExpert}) => {
         if (err) {
           res.status(StatusCode.BadRequest).json({ message: err });
         } else {
@@ -203,6 +264,23 @@ export default class expertController {
           return res.status(StatusCode.OK).json(result); 
         }
         return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getServices  = async (req: Request, res: Response) => {
+    try {
+      ServiceManagement.GetServices({}, (err: any, result: { services: Service[] }) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result.services); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'NoServicesFound' });
       });
     } catch (error) {
       console.error(error);

@@ -10,6 +10,10 @@ const controller = new userController();
 userRoute.post('/loginUser', controller.loginUser);
 userRoute.post('/signupOtp', controller.signupOtp);
 userRoute.post('/resendOtp', controller.resendOtp);
+userRoute.post('/forgotPassOtp', controller.forgotPassOtp);
+userRoute.post('/otpVerify', controller.otpVerify);
+userRoute.post('/updatePassword', controller.updatePassword);
+
 userRoute.post('/registerUser', upload.single('image'), controller.registerUser);
 userRoute.post('/googleLoginUser', controller.googleLoginUser);
 userRoute.get('/getServices', controller.getServices)

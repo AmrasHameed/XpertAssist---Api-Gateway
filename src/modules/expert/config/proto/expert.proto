@@ -6,15 +6,30 @@ service Expert {
     rpc ExpertSignupOtp(ExpertSignupOtpRequest) returns (ExpertSignupOtpResponse);
     rpc ExpertResendOtp(ExpertSignupOtpRequest) returns (ExpertSignupOtpResponse);
     rpc RegisterExpert(RegisterExpertRequest) returns (RegisterExpertResponse);
+    rpc ForgotPassOtp(GoogleLoginExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc OtpVerify(OtpVerifyRequest) returns (ExpertSignupOtpResponse);
+    rpc UpdatePassword(LoginExpertRequest) returns (ExpertSignupOtpResponse);
     rpc GoogleLoginExpert(GoogleLoginExpertRequest) returns (GoogleLoginExpertResponse);
     rpc GetExpert(GetExpertRequest) returns (GetExpertResponse);
-    rpc UpdateExpert(UpdateExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc UpdateExpert(UpdateExpertRequest) returns ( UpdateExpertResponse );
     rpc ChangePassword(ChangePasswordRequest) returns (ExpertSignupOtpResponse);
     rpc VerifyExpert(VerifyExpertRequest) returns (VerifyExpertResponse);
     rpc GetExperts(Empty) returns (GetExpertsResponse);
     rpc ExpertVerification(ExpertVerificationRequest) returns (ExpertSignupOtpResponse);
     rpc BlockExpert(BlockExpertRequest) returns (ExpertSignupOtpResponse);
     rpc IsBlocked(GetExpertRequest) returns (ExpertSignupOtpResponse);
+}
+
+message OtpVerifyRequest {
+    string email = 1;
+    string otp = 2;
+}
+
+message UpdateExpertResponse {
+    string message = 1;
+    string name = 2;
+    string mobile = 3;
+    string expertImage = 4;
 }
 
 message BlockExpertRequest {

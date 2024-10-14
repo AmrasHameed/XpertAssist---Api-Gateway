@@ -18,5 +18,9 @@ adminRoute.get('/getExperts', isValidated, controller.getExperts)
 adminRoute.get('/getExpert/:id', isValidated, controller.getExpert)
 adminRoute.post('/expert/:id/verification', isValidated, controller.expertVerification)
 adminRoute.patch('/experts/:id/block-unblock', isValidated, controller.expertBlock)
+adminRoute.get('/getUsers', isValidated, controller.getUsers)
+adminRoute.patch('/users/:id/block-unblock', isValidated, controller.userBlock)
+
+
 
 export default adminRoute

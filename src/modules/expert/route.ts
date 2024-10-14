@@ -10,6 +10,9 @@ const controller = new expertController()
 expertRoute.post('/loginExpert',controller.loginExpert);
 expertRoute.post('/expertSignupOtp',controller.expertSignupOtp);
 expertRoute.post('/expertResendOtp',controller.expertResendOtp);
+expertRoute.post('/forgotPassOtp',controller.forgotPassOtp);
+expertRoute.post('/otpVerify',controller.otpVerify);
+expertRoute.post('/updatePassword',controller.updatePassword);
 expertRoute.post('/registerExpert', upload.single('image'), controller.registerExpert);
 expertRoute.post('/googleLoginExpert',controller.googleLoginExpert);
 expertRoute.get('/getExpert/:id',isValidated, controller.getExpert);
@@ -17,6 +20,7 @@ expertRoute.post('/updateExpert/:id',isValidated, upload.single('expertImage'), 
 expertRoute.post('/changePassword/:id', isValidated, controller.changePassword)
 expertRoute.post('/verifyExpert/:id', isValidated,upload.single('document'), controller.verifyExpert)
 expertRoute.get('/isBlocked/:id', controller.isBlocked)
+expertRoute.get('/getServices',isValidated,controller.getServices)
 
 
 

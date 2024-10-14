@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthResponse, Service, User } from '../../interfaces/interface';
+import { AuthResponse, Service, UpdateUser, User } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import { UserService } from './config/gRPC-client/user.client';
 import uploadToS3 from '../../services/s3';
@@ -154,7 +154,7 @@ export default class userController {
         userImage = await uploadToS3(files);
       }
       const {id} = req.params
-      UserService.UpdateUser({...req.body,userImage, id}, (err: any, result: {message:string}) => {
+      UserService.UpdateUser({...req.body,userImage, id}, (err: any, result: {user: UpdateUser}) => {
         if (err) {
           res.status(StatusCode.BadRequest).json({ message: err });
         } else {
@@ -203,6 +203,66 @@ export default class userController {
     } catch (error) {
       console.error(error);
       return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  forgotPassOtp = async (req: Request, res: Response) => {
+    try {
+      UserService.ForgotPassOtp(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  otpVerify = async (req: Request, res: Response) => {
+    try {
+      UserService.OtpVerify(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  updatePassword = async (req: Request, res: Response) => {
+    try {
+      UserService.UpdatePassword(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
     }
   };
 }

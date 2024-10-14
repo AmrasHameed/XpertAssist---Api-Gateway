@@ -26,6 +26,24 @@ export interface User {
   email: string;
   mobile: number;
   userImage: string;
+  password?: string;
+  accountStatus?: string;
+  createdAt?: Date;        
+  updatedAt?: Date;
+}
+
+export interface UpdateUser {
+  message: string;
+  name: string;
+  mobile: number;
+  userImage: string;
+}
+
+export interface UpdateExpert {
+  message: string;
+  name: string;
+  mobile: number;
+  expertImage: string;
 }
 
 export interface Expert {

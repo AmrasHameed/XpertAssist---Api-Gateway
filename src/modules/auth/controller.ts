@@ -12,7 +12,7 @@ export const isValidated = AsyncHandler(
       const token = req.cookies?.token || req.headers.authorization?.trim().split(" ")[1];  
       AuthService.IsAuthenticated({ token }, (err:any, result:UserCredentials) => {
         if (err) {
-          console.log(err);
+          console.log(err.details);
           res.status(StatusCode.Unauthorized).json({ success: false, message: err });
         } else {
           next();

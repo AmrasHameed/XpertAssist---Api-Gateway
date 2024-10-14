@@ -1,4 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { v4 as uuidv4 } from 'uuid'; 
+import path from 'path'; 
 
 const s3 = new S3Client({
   region: process.env.AWS_S3_REGION,
@@ -9,11 +11,13 @@ const s3 = new S3Client({
 });
 
 async function uploadToS3(file: Express.Multer.File) {
-  const filename = Date.now().toString() + '-' + file.originalname; 
-  const cloudfrontURL = process.env.CLOUDFRONT_URL; 
+  const uniqueID = uuidv4(); 
+  const fileExtension = path.extname(file.originalname); 
+  const filename = `${uniqueID}${fileExtension}`;
+
   const params = {
     Bucket: process.env.AWS_S3_BUCKET as string,
-    Key: filename,
+    Key: filename, 
     Body: file.buffer,
     ContentType: file.mimetype,
   };
@@ -22,8 +26,7 @@ async function uploadToS3(file: Express.Multer.File) {
 
   try {
     await s3.send(command);
-    console.log("Uploaded file to S3 successfully.");
-    return `${cloudfrontURL}/${filename}`; 
+    return params.Key;
   } catch (error) {
     console.error("Error uploading file to S3:", error);
     throw new Error((error as Error).message);
