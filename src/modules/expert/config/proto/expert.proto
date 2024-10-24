@@ -18,6 +18,18 @@ service Expert {
     rpc ExpertVerification(ExpertVerificationRequest) returns (ExpertSignupOtpResponse);
     rpc BlockExpert(BlockExpertRequest) returns (ExpertSignupOtpResponse);
     rpc IsBlocked(GetExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc SetOnline(SetOnlineRequest) returns (ExpertSignupOtpResponse);
+    rpc SetOffline(GetExpertRequest) returns (ExpertSignupOtpResponse);
+    rpc GetOnlineExperts(SetOnlineRequest) returns (GetOnlineExpertsResponse);
+}
+
+message SetOnlineRequest {
+    string id = 1;
+}
+
+message GetOnlineExpertsResponse {
+    repeated string expertIds = 1;
+    string error = 2;
 }
 
 message OtpVerifyRequest {

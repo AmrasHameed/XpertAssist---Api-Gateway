@@ -21,6 +21,8 @@ expertRoute.post('/changePassword/:id', isValidated, controller.changePassword)
 expertRoute.post('/verifyExpert/:id', isValidated,upload.single('document'), controller.verifyExpert)
 expertRoute.get('/isBlocked/:id', controller.isBlocked)
 expertRoute.get('/getServices',isValidated,controller.getServices)
+expertRoute.post('/setOnline/:id',isValidated,controller.setOnline)
+expertRoute.post('/setOffline/:id',isValidated,controller.setOffline)
 
 
 

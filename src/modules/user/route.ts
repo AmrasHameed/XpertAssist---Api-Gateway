@@ -22,4 +22,6 @@ userRoute.post('/updateProfile/:id', isValidated, upload.single('userImage'), co
 userRoute.post('/changePassword/:id', isValidated, controller.changePassword)
 userRoute.get('/isBlocked/:id', controller.isBlocked)
 
+userRoute.post('/sendServiceRequest', isValidated, controller.sendServiceRequest)
+
 export default userRoute;

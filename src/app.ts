@@ -15,14 +15,17 @@ import userRoute from './modules/user/route';
 import authRoute from './modules/auth/route';
 import adminRoute from './modules/admin/route';
 import expertRoute from './modules/expert/route';
+import SocketService from './services/socket';
 
 class App {
   public app: Application;
-  server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
+  public server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
+  public socketService: SocketService;
 
   constructor() {
     this.app = express();
     this.server = http.createServer(this.app);
+    this.socketService = new SocketService(this.server);
     this.ensureLogDirectoryExists();
     this.applyMiddleware();
     this.routes();

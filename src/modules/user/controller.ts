@@ -4,6 +4,7 @@ import { StatusCode } from '../../interfaces/enum';
 import { UserService } from './config/gRPC-client/user.client';
 import uploadToS3 from '../../services/s3';
 import { ServiceManagement } from '../serviceManagement/config/gRPC-client/service.client';
+import { ExpertService } from '../expert/config/gRPC-client/auth.expert';
 
 export default class userController {
   loginUser = (req: Request, res: Response) => {
@@ -249,6 +250,26 @@ export default class userController {
   updatePassword = async (req: Request, res: Response) => {
     try {
       UserService.UpdatePassword(
+        req.body,
+        (err: any, result: { message: string }) => {
+          if (err) {
+            res.status(StatusCode.BadRequest).json({ message: err });
+          } else {
+            res.status(StatusCode.Created).json(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(StatusCode.InternalServerError)
+        .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  sendServiceRequest = async (req: Request, res: Response) => {
+    try {
+      ExpertService.SendServiceRequest(
         req.body,
         (err: any, result: { message: string }) => {
           if (err) {

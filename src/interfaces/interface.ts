@@ -47,12 +47,12 @@ export interface UpdateExpert {
 }
 
 export interface Expert {
-  message: string;
-  id: string;              
-  name: string;
-  email: string;
-  mobile: number;
-  expertImage: string;
+  message?: string;
+  id?: string;              
+  name?: string;
+  email?: string;
+  mobile?: number;
+  expertImage?: string;
   service?: string;
   password?: string;
   accountStatus?: string;   
@@ -62,6 +62,7 @@ export interface Expert {
     govIdNumber?: string;
     document?: string;
   };
+  status?: string;
   createdAt?: Date;        
   updatedAt?: Date;
 }

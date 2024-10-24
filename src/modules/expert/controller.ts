@@ -271,7 +271,7 @@ export default class expertController {
     }
   };
 
-  getServices  = async (req: Request, res: Response) => {
+  getServices = async (req: Request, res: Response) => {
     try {
       ServiceManagement.GetServices({}, (err: any, result: { services: Service[] }) => {
         if (err) {
@@ -281,6 +281,42 @@ export default class expertController {
           return res.status(StatusCode.OK).json(result.services); 
         }
         return res.status(StatusCode.NotFound).json({ message: 'NoServicesFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  setOnline =async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params;
+      ExpertService.SetOnline({id}, (err: any, result: { message: string}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'User Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  setOffline =async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params;
+      ExpertService.SetOffline({id}, (err: any, result: { message: string}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'User Not Found' });
       });
     } catch (error) {
       console.error(error);
