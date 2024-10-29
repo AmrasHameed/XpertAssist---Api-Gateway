@@ -32,6 +32,30 @@ export interface User {
   updatedAt?: Date;
 }
 
+export interface Job {
+  message: string;
+  _id: string;
+  service: string;
+  expertId: string;
+  userId: string;
+  userLocation: {
+    lat: number;
+    lng: number;
+  };
+  expertLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  notes?: string;
+  distance: number;
+  totalAmount: number;
+  ratePerHour: number;
+  status: string;
+  pin: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface UpdateUser {
   message: string;
   name: string;

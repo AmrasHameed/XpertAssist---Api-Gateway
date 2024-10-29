@@ -8,6 +8,56 @@ service Service {
   rpc GetService(GetServiceRequest) returns (ServiceMessage); 
   rpc UpdateService(UpdateServiceRequest) returns (AddServiceResponse); 
   rpc DeleteService(GetServiceRequest) returns (AddServiceResponse);
+  rpc CreateService (CreateServiceRequest) returns (GetServiceRequest);
+  rpc GetJobData (GetServiceRequest) returns (JobData);
+  rpc StartJob(GetServiceRequest) returns (AddServiceResponse);
+}
+
+message UserLocation {
+  double lat = 1;   
+  double lng = 2;   
+}
+
+
+message JobData {
+  string message = 1;         
+  string _id = 2;              
+  string service = 3;         
+  string expertId = 4;         
+  string userId = 5;          
+  UserLocation userLocation = 6; 
+  ExpertLocation expertLocation = 7; 
+  string notes = 8;         
+  double distance = 9;         
+  double totalAmount = 10;    
+  double ratePerHour = 11;     
+  string status = 12;         
+  int32 pin = 13;             
+  string createdAt = 14; 
+  string updatedAt = 15; 
+}
+
+message Location {
+  double lat = 1;
+  double lng = 2;
+}
+
+message ExpertLocation {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message CreateServiceRequest {
+  string expertId = 1;
+  Location userLocation = 2;
+  ExpertLocation expertLocation = 3;
+  string service = 4;
+  string notes = 5;
+  double distance = 6;
+  string userId = 7;
+  int32 totalAmount = 8;
+  int32 ratePerHour = 9;
+  int32 pin = 10;
 }
 
 message Empty {}

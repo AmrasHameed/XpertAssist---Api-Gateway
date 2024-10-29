@@ -24,6 +24,11 @@ expertRoute.get('/getServices',isValidated,controller.getServices)
 expertRoute.post('/setOnline/:id',isValidated,controller.setOnline)
 expertRoute.post('/setOffline/:id',isValidated,controller.setOffline)
 
+expertRoute.get('/jobdata/:id', isValidated, controller.getJobData)
+expertRoute.get('/getUser/:id', isValidated, controller.getUser)
+
+
+
 
 
 export default expertRoute

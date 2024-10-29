@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthResponse, Service, UpdateUser, User } from '../../interfaces/interface';
+import { AuthResponse, Expert, Job, Service, UpdateUser, User } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import { UserService } from './config/gRPC-client/user.client';
 import uploadToS3 from '../../services/s3';
@@ -284,6 +284,43 @@ export default class userController {
       return res
         .status(StatusCode.InternalServerError)
         .json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getJobData = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ServiceManagement.GetJobData({id}, (err: any, result: { job: Job}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Job Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getExpert = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ExpertService.GetExpert({id}, (err: any, result: { expert: Expert}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          console.log(result)
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
     }
   };
 }

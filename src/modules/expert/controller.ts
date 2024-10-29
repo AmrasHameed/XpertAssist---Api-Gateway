@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import { AuthResponse, Expert, Service, UpdateExpert } from '../../interfaces/interface';
+import { AuthResponse, Expert, Job, Service, UpdateExpert, User } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import uploadToS3 from '../../services/s3';
 import { ExpertService } from './config/gRPC-client/auth.expert';
 import { ServiceManagement } from '../serviceManagement/config/gRPC-client/service.client';
+import { UserService } from '../user/config/gRPC-client/user.client';
 
 export default class expertController {
   loginExpert = (req: Request, res: Response) => {
@@ -317,6 +318,42 @@ export default class expertController {
           return res.status(StatusCode.OK).json(result); 
         }
         return res.status(StatusCode.NotFound).json({ message: 'User Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getJobData = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ServiceManagement.GetJobData({id}, (err: any, result: { job: Job}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Job Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getUser = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      UserService.GetUser({id}, (err: any, result: { user: User}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
       });
     } catch (error) {
       console.error(error);

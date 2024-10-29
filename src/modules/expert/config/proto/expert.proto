@@ -21,6 +21,7 @@ service Expert {
     rpc SetOnline(SetOnlineRequest) returns (ExpertSignupOtpResponse);
     rpc SetOffline(GetExpertRequest) returns (ExpertSignupOtpResponse);
     rpc GetOnlineExperts(SetOnlineRequest) returns (GetOnlineExpertsResponse);
+    rpc NotAvailable(SetOnlineRequest) returns (ExpertSignupOtpResponse);
 }
 
 message SetOnlineRequest {

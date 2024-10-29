@@ -23,5 +23,7 @@ userRoute.post('/changePassword/:id', isValidated, controller.changePassword)
 userRoute.get('/isBlocked/:id', controller.isBlocked)
 
 userRoute.post('/sendServiceRequest', isValidated, controller.sendServiceRequest)
+userRoute.get('/jobdata/:id', isValidated, controller.getJobData)
+userRoute.get('/getexpert/:id', isValidated, controller.getExpert)
 
 export default userRoute;
