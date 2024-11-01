@@ -313,7 +313,6 @@ export default class userController {
           return res.status(StatusCode.BadRequest).json({ message: err.message });
         }
         if (result) { 
-          console.log(result)
           return res.status(StatusCode.OK).json(result); 
         }
         return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });

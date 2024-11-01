@@ -14,6 +14,7 @@ class SocketService {
   private io: SocketIOServer;
   private userRequestData: { userId: string; location: any; service: string; notes: string } | null = null;
   private serviceData: { userData: any; userLocation: any;expertLocation:any; service: string; notes: string; distance: number; expertId:string; totalAmount?: number; ratePerHour?: number; pin?: number; jobId?: string, userId?: string} | null = null;
+  private userSocketMap: Map<string, string> = new Map();
 
   constructor(server: HttpServer) {
     this.io = new SocketIOServer(server, {
@@ -217,6 +218,51 @@ class SocketService {
       socket.on('expert_send_message', ({ roomName, message }) => {
         console.log(`Expert message to room ${roomName}:`, message);
         this.io.to(roomName).emit('receive-user-message', { message });
+      });
+
+      socket.on('join_call',(data)=>{
+        this.userSocketMap.set(data, socket.id);
+      })
+
+      socket.on('callUser', ({ userToCall, from, offer, fromId }) => {
+        const userSocketId = this.userSocketMap.get(userToCall);
+        if (userSocketId) {
+            this.io.to(userSocketId).emit('incomingCall', { from, offer, fromId });
+        }
+      });
+
+      socket.on('signal', (data) => {
+        const { userId, type, candidate, answer, context } = data;        
+        if (context === 'webRTC') {
+          const userSocketId = this.userSocketMap.get(userId);
+          if (userSocketId) {
+            this.io.to(userSocketId).emit('signal', { type, candidate, answer });
+          }
+        }
+      });
+
+      socket.on('callAccepted', ({ userId, answer, context }) => {
+        if (context === 'webRTC') {
+          const userSocketId = this.userSocketMap.get(userId) || '';
+          this.io.to(userSocketId).emit('callAcceptedSignal', { answer });
+        }
+      });
+
+      socket.on('callReject', (currentUser) => {
+        let userSocketId = this.userSocketMap.get(currentUser) || '';
+        this.io.to(userSocketId).emit('callEndedSignal');
+      });
+  
+      socket.on('callEnded', (userId, expertId) => {
+        let userSocketId = this.userSocketMap.get(userId) || '';
+        let expertSocketId = this.userSocketMap.get(expertId) || '';
+        console.log(userSocketId, expertSocketId, '=======>', userId, expertId)
+        if(userSocketId) {
+          this.io.to(userSocketId).emit('callEndedSignal');
+        }
+        if(expertSocketId) {
+          this.io.to(expertSocketId).emit('callEndedSignal');
+        }
       });
     
       
