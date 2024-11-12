@@ -17,6 +17,12 @@ service User {
     rpc ForgotPassOtp(GoogleLoginUserRequest) returns (SignupOtpResponse);
     rpc OtpVerify(OtpVerifyRequest) returns (SignupOtpResponse);
     rpc UpdatePassword(LoginUserRequest) returns (SignupOtpResponse);
+    rpc GetUserData(Empty) returns (GetUserDataResponse);
+}
+
+message GetUserDataResponse {
+    int64 totalUsers = 1;
+    double userGrowthRate = 2;
 }
 
 message OtpVerifyRequest {

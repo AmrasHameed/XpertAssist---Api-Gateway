@@ -12,8 +12,26 @@ import axios from 'axios';
 
 class SocketService {
   private io: SocketIOServer;
-  private userRequestData: { userId: string; location: any; service: string; notes: string } | null = null;
-  private serviceData: { userData: any; userLocation: any;expertLocation:any; service: string; notes: string; distance: number; expertId:string; totalAmount?: number; ratePerHour?: number; pin?: number; jobId?: string, userId?: string} | null = null;
+  private userRequestData: {
+    userId: string;
+    location: any;
+    service: string;
+    notes: string;
+  } | null = null;
+  private serviceData: {
+    userData: any;
+    userLocation: any;
+    expertLocation: any;
+    service: string;
+    notes: string;
+    distance: number;
+    expertId: string;
+    totalAmount?: number;
+    ratePerHour?: number;
+    pin?: number;
+    jobId?: string;
+    userId?: string;
+  } | null = null;
   private userSocketMap: Map<string, string> = new Map();
 
   constructor(server: HttpServer) {
@@ -88,155 +106,193 @@ class SocketService {
         this.userRequestData = { userId, location, service, notes };
         const expertAvailabilityTimeout = setTimeout(() => {
           if (!this.serviceData) {
-            socket.emit('no-experts-available', { message: 'No experts are available at this time. Please try again later.' });
+            socket.emit('no-experts-available', {
+              message:
+                'No experts are available at this time. Please try again later.',
+            });
           }
         }, 20000);
         ExpertService.GetOnlineExperts(
-          { id:service },
+          { id: service },
           (err: any, result: { expertIds: Expert[] }) => {
             if (err) {
               console.error('Error fetching experts:', err);
               clearTimeout(expertAvailabilityTimeout);
-              return; 
+              return;
             }
             if (result && result.expertIds && result.expertIds.length > 0) {
-              const arrayOfExpertIds = result.expertIds
-              this.io.emit('get-nearby-experts',  arrayOfExpertIds );
+              const arrayOfExpertIds = result.expertIds;
+              this.io.emit('get-nearby-experts', arrayOfExpertIds);
               clearTimeout(expertAvailabilityTimeout);
             } else {
-              console.error('No experts found for the requested service')
+              console.error('No experts found for the requested service');
             }
           }
         );
       });
-      socket.on('expertLocation', async(latitude: number, longitude: number, expertId: string) => {
-        if (this.userRequestData) {
-          const { location, service, userId, notes } = this.userRequestData;
-          const radius = calculateDistance(location, { latitude, longitude });
-          if (radius <= 5) {
-            const origin = `${location.lat},${location.lng}`;
-            const destination = `${latitude},${longitude}`;
-            const API_KEY = process.env.OLA_MAPS_API_KEY
-            const { data } = await axios.post(
-              'https://api.olamaps.io/routing/v1/directions',
-              null,
-              {
-                params: {
-                  origin,
-                  destination,
-                  api_key: API_KEY,
-                },
+      socket.on(
+        'expertLocation',
+        async (latitude: number, longitude: number, expertId: string) => {
+          if (this.userRequestData) {
+            const { location, service, userId, notes } = this.userRequestData;
+            const radius = calculateDistance(location, { latitude, longitude });
+            if (radius <= 5) {
+              const origin = `${location.lat},${location.lng}`;
+              const destination = `${latitude},${longitude}`;
+              const API_KEY = process.env.OLA_MAPS_API_KEY;
+              const { data } = await axios.post(
+                'https://api.olamaps.io/routing/v1/directions',
+                null,
+                {
+                  params: {
+                    origin,
+                    destination,
+                    api_key: API_KEY,
+                  },
+                }
+              );
+              const distance = data?.routes[0]?.legs[0]?.distance / 1000;
+              console.log(distance, 'distance');
+              UserService.GetUser({ id: userId }, (err: any, result: User) => {
+                if (err) {
+                  console.error('Error fetching user:', err);
+                  return;
+                }
+                if (result) {
+                  const { name, email, mobile, userImage } = result;
+                  const userData = { name, email, mobile, userImage };
+                  this.serviceData = {
+                    expertId,
+                    userLocation: location,
+                    expertLocation: { latitude, longitude },
+                    service,
+                    notes,
+                    userData,
+                    distance,
+                  };
+                  this.io.emit('new-service-request', this.serviceData);
+                } else {
+                  console.error('No Users found');
+                }
+              });
+            }
+          } else {
+            console.error('No user request data found for this expert.');
+          }
+        }
+      );
+      socket.on('accept-service', (data) => {
+        const { totalAmount, ratePerHour } = data;
+        const pin = generatePIN();
+        if (this.serviceData) {
+          this.serviceData = {
+            ...this.serviceData,
+            expertId: data.expertId,
+            userId: this.userRequestData?.userId,
+            totalAmount,
+            ratePerHour,
+            pin,
+          };
+          ExpertService.NotAvailable(
+            { id: this.serviceData.expertId },
+            (err: any, result: string) => {
+              if (err) {
+                console.error('Error fetching user:', err);
+                return;
               }
-            );
-            const distance = (data?.routes[0]?.legs[0]?.distance)/1000
-            UserService.GetUser({ id: userId }, (err: any, result: User ) => {
+            }
+          );
+          const { userData, ...filteredServiceData } = this.serviceData;
+          ServiceManagement.CreateService(
+            filteredServiceData,
+            (err: any, result: { id: string }) => {
               if (err) {
                 console.error('Error fetching user:', err);
                 return;
               }
               if (result) {
-                const {name, email, mobile, userImage} = result
-                const userData = {name, email, mobile, userImage};
-                this.serviceData = {expertId, userLocation:location,expertLocation:{latitude,longitude}, service, notes, userData, distance};
-                this.io.emit('new-service-request', this.serviceData);
+                const { id } = result;
+                if (this.serviceData) {
+                  this.serviceData = { ...this.serviceData, jobId: id };
+                  const jobId = this.serviceData.jobId;
+                  const expertId = this.serviceData.expertId;
+                  this.io.emit('expert-confirmation', { jobId, expertId });
+                } else {
+                  console.error('No service data to update');
+                }
               } else {
                 console.error('No Users found');
               }
-            });
-          }
-        } else {
-          console.error('No user request data found for this expert.');
-        }
-      });
-      socket.on('accept-service', (data) => {
-        const { totalAmount, ratePerHour } = data;
-        const pin = generatePIN()
-        if(this.serviceData) {
-          this.serviceData = { ...this.serviceData,expertId:data.expertId,userId: this.userRequestData?.userId, totalAmount, ratePerHour, pin };
-          ExpertService.NotAvailable({id: this.serviceData.expertId}, (err:any, result: string) => {
-            if (err) {
-              console.error('Error fetching user:', err);
-              return;
             }
-          })
-          const { userData, ...filteredServiceData } = this.serviceData;
-          ServiceManagement.CreateService(filteredServiceData, (err: any, result: { id: string } ) => {
-            if (err) {
-              console.error('Error fetching user:', err);
-              return;
-            }
-            if (result) {
-              const {id} = result
-              if(this.serviceData) {
-                this.serviceData = {...this.serviceData, jobId:id}
-                const jobId = this.serviceData.jobId
-                const expertId = this.serviceData.expertId
-                this.io.emit('expert-confirmation',{jobId,expertId});
-              } else {
-                console.error('No service data to update');
-              }
-            } else {
-              console.error('No Users found');
-            }
-          });
+          );
         } else {
           console.error('No service data to update');
         }
       });
 
-      socket.on('user-confirmation',(jobId: string)=>{
-        const userId = this.serviceData?.userId
-        this.io.emit('user-confirmed', {jobId,userId})
-      })
+      socket.on('user-confirmation', (jobId: string) => {
+        const userId = this.serviceData?.userId;
+        this.io.emit('user-confirmed', { jobId, userId });
+      });
 
-      socket.on('otp-verified',(jobId, expertId, userId, )=>{
-        ServiceManagement.StartJob( {id:jobId}, (err: any, result:{message: string }) => {
-          if (err) {
-            console.error('Error fetching user:', err);
-            return;
+      socket.on('otp-verified', ({ jobId, expertId, userId }) => {
+        console.log(jobId);
+        ServiceManagement.StartJob(
+          { id: jobId },
+          (err: any, result: { message: string }) => {
+            if (err) {
+              console.error('Error fetching user:', err);
+              return;
+            }
+            console.log(result);
+            if (result.message === 'success') {
+              this.io.emit('start-job', expertId, userId);
+            } else {
+              console.error('No Jobs found');
+            }
           }
-          console.log(result)
-          if (result.message ==='success') {
-            this.io.emit('start-job',expertId, userId)
-          } else {
-            console.error('No Jobs found');
-          }
-        });
-        console.log(expertId, userId, jobId)
-      })
+        );
+        console.log(expertId, userId, jobId);
+      });
 
       socket.on('join_chat', (roomName) => {
         socket.join(roomName);
         console.log(`Socket ${socket.id} joined room ${roomName}`);
       });
 
-      socket.on('user_send_message', ({ roomName, message }) => {
-        console.log(`User message to room ${roomName}:`, message);
-        this.io.to(roomName).emit('receive-expert-message', { message });
+      socket.on('user_send_message', ({ expert, message }) => {
+        console.log(`User message to ${expert}:`, message);
+        const userSocketId = this.userSocketMap.get(expert) || '';
+        this.io.to(userSocketId).emit('receive-expert-message', { message });
       });
 
-      socket.on('expert_send_message', ({ roomName, message }) => {
-        console.log(`Expert message to room ${roomName}:`, message);
-        this.io.to(roomName).emit('receive-user-message', { message });
+      socket.on('expert_send_message', ({ user, message }) => {
+        console.log(`Expert message to ${user}:`, message);
+        const userSocketId = this.userSocketMap.get(user) || '';
+        this.io.to(userSocketId).emit('receive-user-message', { message });
       });
 
-      socket.on('join_call',(data)=>{
+      socket.on('join_call', (data) => {
         this.userSocketMap.set(data, socket.id);
-      })
+      });
 
       socket.on('callUser', ({ userToCall, from, offer, fromId }) => {
         const userSocketId = this.userSocketMap.get(userToCall);
         if (userSocketId) {
-            this.io.to(userSocketId).emit('incomingCall', { from, offer, fromId });
+          this.io
+            .to(userSocketId)
+            .emit('incomingCall', { from, offer, fromId });
         }
       });
 
       socket.on('signal', (data) => {
-        const { userId, type, candidate, answer, context } = data;        
+        const { userId, type, candidate, answer, context } = data;
         if (context === 'webRTC') {
           const userSocketId = this.userSocketMap.get(userId);
           if (userSocketId) {
-            this.io.to(userSocketId).emit('signal', { type, candidate, answer });
+            this.io
+              .to(userSocketId)
+              .emit('signal', { type, candidate, answer });
           }
         }
       });
@@ -252,20 +308,103 @@ class SocketService {
         let userSocketId = this.userSocketMap.get(currentUser) || '';
         this.io.to(userSocketId).emit('callEndedSignal');
       });
-  
+
       socket.on('callEnded', (userId, expertId) => {
         let userSocketId = this.userSocketMap.get(userId) || '';
         let expertSocketId = this.userSocketMap.get(expertId) || '';
-        console.log(userSocketId, expertSocketId, '=======>', userId, expertId)
-        if(userSocketId) {
+        console.log(userSocketId, expertSocketId, '=======>', userId, expertId);
+        if (userSocketId) {
           this.io.to(userSocketId).emit('callEndedSignal');
         }
-        if(expertSocketId) {
+        if (expertSocketId) {
           this.io.to(expertSocketId).emit('callEndedSignal');
         }
       });
-    
-      
+
+      socket.on('job-complete', ({ userId, expertId }) => {
+        let userSocketId = this.userSocketMap.get(userId) || '';
+        let expertSocketId = this.userSocketMap.get(expertId) || '';
+        if (userSocketId) {
+          this.io.to(userSocketId).emit('jobCompleted');
+        }
+        if (expertSocketId) {
+          this.io.to(expertSocketId).emit('jobCompleted');
+        }
+      });
+
+      const storeEarningListener = ({
+        expertId,
+        jobId,
+        totalEarning,
+      }: {
+        expertId: string;
+        jobId: string;
+        totalEarning: number;
+      }) => {
+        console.log(expertId, jobId, totalEarning, 'storing earning');
+        ExpertService.StoreEarning(
+          { id: expertId, jobId, totalEarning },
+          (err: any, result: { message: string }) => {
+            if (err) {
+              console.error('Error storing earnings:', err);
+              return;
+            }
+            if (result.message === 'success') {
+              console.log('Earnings Stored Successfully');
+            } else {
+              console.error('No experts found for the requested service');
+            }
+          }
+        );
+      };
+
+      socket
+        .off('storeEarning', storeEarningListener)
+        .on('storeEarning', storeEarningListener);
+
+      socket.on('cashOnDelivery', ({ expertId, amount }) => {
+        let expertSocketId = this.userSocketMap.get(expertId) || '';
+        if (expertSocketId) {
+          this.io.to(expertSocketId).emit('cashOnDelivery', { amount });
+        }
+      });
+
+      socket.on('cashRecieved', ({ userId, amount, expertId, jobId}) => {
+        console.log(this.userSocketMap, 'user');
+        ExpertService.DeductFromWallet(
+          { amount, expertId, jobId },
+          (err: any, result: { message: string }) => {
+            if (err) {
+              console.error('Error storing earnings:', err);
+              return;
+            }
+            if (result.message === 'success') {
+              let userSocketId = this.userSocketMap.get(userId) || '';
+              if (userSocketId) {
+                this.io.to(userSocketId).emit('cashRecieved');
+              }
+            } else {
+              console.error('No experts found for the requested service');
+            }
+          }
+        );
+      });
+
+      socket.on('cashNotRecieved', ({ userId }) => {
+        console.log(this.userSocketMap, 'user');
+        let userSocketId = this.userSocketMap.get(userId) || '';
+        if (userSocketId) {
+          this.io.to(userSocketId).emit('cashNotRecieved');
+        }
+      });
+
+      socket.on('paymentDone', ({ expertId }) => {
+        let expertSocketId = this.userSocketMap.get(expertId) || '';
+        if (expertSocketId) {
+          this.io.to(expertSocketId).emit('paymentConfirmed');
+        }
+      });
+
       socket.on('disconnect', () => {
         console.log(`Client disconnected: ${socket.id}`);
       });

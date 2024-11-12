@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthResponse, Expert, Job, Service, UpdateExpert, User } from '../../interfaces/interface';
+import { AggregationResponse, AuthResponse, Expert, Job, Service, UpdateExpert, User, WalletDataResponse } from '../../interfaces/interface';
 import { StatusCode } from '../../interfaces/enum';
 import uploadToS3 from '../../services/s3';
 import { ExpertService } from './config/gRPC-client/auth.expert';
@@ -360,4 +360,121 @@ export default class expertController {
       return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
     }
   };
+
+  getExpertDetails = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ExpertService.GetExpertDetails({id}, (err: any, result: {expert: Expert}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'UserNotFound' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getExpertDashboard = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ServiceManagement.GetExpertDashboard({id}, (err: any, result: AggregationResponse) => {
+        console.log(err)
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Job Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  }; 
+
+  previousJobs = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ServiceManagement.PreviousJobs({id}, async (err: any, result:{jobs: Job[]}) => {
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result && result.jobs.length > 0) { 
+          try {
+            const jobsWithUserDetails = await Promise.all(
+              result.jobs.map((job) => 
+                new Promise((resolve, reject) => {
+                  UserService.GetUser({ id: job.userId }, (userError: any,  res: { user: User }) => {
+                    if (userError) {
+                      console.error('Error fetching user details:', userError);
+                      return reject(userError);
+                    }
+                    resolve({
+                      ...job,
+                      userDetails: res,
+                    });
+                  });
+                })
+              )
+            );
+            console.log(jobsWithUserDetails)
+            return res.status(StatusCode.OK).json({ jobs: jobsWithUserDetails });
+          } catch (userError) {
+            console.error('Error fetching user details:', userError);
+            return res.status(StatusCode.InternalServerError).json({ message: 'Error fetching user details' });
+          }
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Job Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  }; 
+
+
+  walletData = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      ExpertService.GetWalletData({id}, (err: any, result: WalletDataResponse) => {
+        console.log(err)
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Expert Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  }; 
+
+  withdraw = async (req: Request, res: Response) => {
+    try {
+      const {id} = req.params
+      const {amount} = req.body
+      ExpertService.Withdraw({id, amount}, (err: any, result: {message: string}) => {
+        console.log(err)
+        if (err) {
+          return res.status(StatusCode.BadRequest).json({ message: err.message });
+        }
+        if (result) { 
+          return res.status(StatusCode.OK).json(result); 
+        }
+        return res.status(StatusCode.NotFound).json({ message: 'Expert Not Found' });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCode.InternalServerError).json({ message: 'Internal Server Error' });
+    }
+  }; 
 }

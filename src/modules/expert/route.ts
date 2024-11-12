@@ -23,6 +23,14 @@ expertRoute.get('/isBlocked/:id', controller.isBlocked)
 expertRoute.get('/getServices',isValidated,controller.getServices)
 expertRoute.post('/setOnline/:id',isValidated,controller.setOnline)
 expertRoute.post('/setOffline/:id',isValidated,controller.setOffline)
+expertRoute.get('/getExpertDetails/:id',isValidated, controller.getExpertDetails);
+expertRoute.get('/getExpertDashboard/:id',isValidated, controller.getExpertDashboard);
+expertRoute.get('/previousJobs/:id',isValidated, controller.previousJobs);
+expertRoute.get('/walletData/:id',isValidated, controller.walletData);
+expertRoute.put('/withdraw/:id',isValidated, controller.withdraw);
+
+
+
 
 expertRoute.get('/jobdata/:id', isValidated, controller.getJobData)
 expertRoute.get('/getUser/:id', isValidated, controller.getUser)

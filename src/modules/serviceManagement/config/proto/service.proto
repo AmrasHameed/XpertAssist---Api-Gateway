@@ -11,6 +11,54 @@ service Service {
   rpc CreateService (CreateServiceRequest) returns (GetServiceRequest);
   rpc GetJobData (GetServiceRequest) returns (JobData);
   rpc StartJob(GetServiceRequest) returns (AddServiceResponse);
+  rpc PaymentSuccess(PaymentSuccessRequest) returns (AddServiceResponse);
+  rpc GetExpertDashboard(GetServiceRequest) returns (GetJobsExpertResponse);
+  rpc PreviousJobs(GetServiceRequest) returns (PreviousJobsResponse);
+  rpc GetServiceData(Empty) returns (GetServiceDataResponse);
+  rpc PreviousJobsUser(GetServiceRequest) returns (PreviousJobsResponse);
+  rpc GetJobs(Empty) returns (PreviousJobsResponse);
+} 
+
+message TopBookedService {
+  string serviceId = 1;
+  int32 bookingCount = 2;
+  string name = 3;
+}
+
+message GetServiceDataResponse {
+  int32 totalServices = 1;
+  double serviceGrowthRate = 2;
+  int32 totalJobsCompleted = 3;
+  double jobCompletionGrowthRate = 4;
+  repeated TopBookedService top5BookedServices = 5;
+}
+
+message PreviousJobsResponse {
+  repeated JobData jobs = 1;
+}
+
+message DailyEarnings {
+  int32 _id = 1;
+  double dailyEarnings = 2;
+  string date = 3;
+}
+
+message GetJobsExpertResponse {
+  repeated DailyEarnings dailyEarningsCurrentMonth = 1;
+  double totalEarnings = 2;
+  int32 totalJobs = 3;
+  int32 totalCompletedJobs = 4;
+  double totalDistance = 5;
+  double totalEarningsGrowth = 6;
+  double totalJobsGrowth = 7;
+  double totalCompletedJobsGrowth = 8;
+  double totalDistanceGrowth = 9;
+}
+
+message PaymentSuccessRequest {
+  string id = 1;
+  double amount = 2;
+  string paymentType = 3;
 }
 
 message UserLocation {
@@ -32,9 +80,10 @@ message JobData {
   double totalAmount = 10;    
   double ratePerHour = 11;     
   string status = 12;         
-  int32 pin = 13;             
-  string createdAt = 14; 
-  string updatedAt = 15; 
+  int32 pin = 13;       
+  string payment = 14;   
+  string createdAt = 15; 
+  string updatedAt = 16; 
 }
 
 message Location {

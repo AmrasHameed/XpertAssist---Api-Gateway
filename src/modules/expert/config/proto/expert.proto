@@ -22,6 +22,73 @@ service Expert {
     rpc SetOffline(GetExpertRequest) returns (ExpertSignupOtpResponse);
     rpc GetOnlineExperts(SetOnlineRequest) returns (GetOnlineExpertsResponse);
     rpc NotAvailable(SetOnlineRequest) returns (ExpertSignupOtpResponse);
+    rpc StoreEarning(StoreEarningRequest) returns (ExpertSignupOtpResponse);
+    rpc GetExpertDetails(SetOnlineRequest) returns (GetExpertDetailsResponse);
+    rpc DeductFromWallet(DeductFromWalletRequest) returns (ExpertSignupOtpResponse);
+    rpc GetWalletData(SetOnlineRequest) returns (GetWalletDataResponse);
+    rpc Withdraw(WithdrawRequest) returns (ExpertSignupOtpResponse);
+    rpc GetExpertData(Empty) returns (GetExpertDataResponse);
+}
+
+message GetExpertDataResponse {
+    int64 totalExperts = 1;
+    double expertGrowthRate = 2;
+    repeated TopExpert top5Experts = 3;
+}
+
+message TopExpert {
+    string expertId = 1;
+    string name = 2;
+    string email = 3;
+    double totalEarning = 4;
+}
+
+message WithdrawRequest {
+    string id = 1;
+    double amount = 2;
+}
+
+message GetWalletDataResponse {
+    double totalEarning = 1;
+    repeated Earning earnings = 2;
+}
+
+message DeductFromWalletRequest {
+    string expertId = 1;
+    double amount = 2;
+    string jobId = 3;
+}
+
+message Earning {
+    string jobId = 1;
+    double earning = 2;
+    string type = 3;
+}
+  
+
+message GetExpertDetailsResponse {
+    string message = 1;
+    string id = 2;
+    string name = 3;
+    string email = 4;
+    uint64 mobile = 5;
+    string expertImage = 6;
+    string service = 7;
+    string password = 8;
+    string accountStatus = 9;
+    string isVerified = 10;
+    VerificationDetails verificationDetails = 11;
+    string status = 12;
+    repeated Earning earnings = 13;
+    double totalEarning = 14;
+    string createdAt = 15;
+    string updatedAt = 16;
+}
+
+message StoreEarningRequest {
+    string id = 1;
+    string jobId = 2;
+    float totalEarning = 3;
 }
 
 message SetOnlineRequest {

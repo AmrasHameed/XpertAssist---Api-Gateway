@@ -70,6 +70,17 @@ export interface UpdateExpert {
   expertImage: string;
 }
 
+interface Earning {
+  jobId: string;
+  earning: number;
+  type: string;
+}
+
+export interface WalletDataResponse {
+  totalEarning: number;
+  earnings: Earning[];
+}
+
 export interface Expert {
   message?: string;
   id?: string;              
@@ -87,6 +98,8 @@ export interface Expert {
     document?: string;
   };
   status?: string;
+  earnings?: Earning[];
+  totalEarning?: number;
   createdAt?: Date;        
   updatedAt?: Date;
 }
@@ -108,3 +121,61 @@ export interface UserCredentials {
   userId: string;
   role: string;
 }
+
+interface DailyEarnings {
+  _id: number;
+  dailyEarnings: number;
+  date: string;
+}
+
+export interface AggregationResponse {
+  dailyEarningsCurrentMonth: DailyEarnings[];
+  totalEarnings: number;
+  totalJobs: number;
+  totalCompletedJobs: number;
+  totalDistance: number;
+  totalEarningsGrowth: number | null;
+  totalJobsGrowth: number | null;
+  totalCompletedJobsGrowth: number | null;
+  totalDistanceGrowth: number | null;
+}
+
+export interface UserData {
+  totalUsers: number; 
+  userGrowthRate: number; 
+}
+
+export interface ExpertData {
+  totalExperts: number; 
+  expertGrowthRate: number; 
+  top5Experts: TopExpert[];
+}
+
+export interface TopExpert {
+  expertId: string; 
+  name: string;
+  email: string;
+  totalEarning: number;
+}
+
+export interface ServiceData {
+  totalServices: number; 
+  serviceGrowthRate: number; 
+  totalJobsCompleted: number; 
+  jobCompletionGrowthRate: number; 
+  top5BookedServices: TopBookedService[]; 
+}
+
+export interface TopBookedService {
+  serviceId: string; 
+  bookingCount: number; 
+  name: string;
+}
+
+export interface DashboardData {
+  userData: UserData; 
+  expertData: ExpertData; 
+  serviceData: ServiceData; 
+}
+
+

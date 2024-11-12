@@ -25,5 +25,11 @@ userRoute.get('/isBlocked/:id', controller.isBlocked)
 userRoute.post('/sendServiceRequest', isValidated, controller.sendServiceRequest)
 userRoute.get('/jobdata/:id', isValidated, controller.getJobData)
 userRoute.get('/getexpert/:id', isValidated, controller.getExpert)
+userRoute.get('/previousJobsUser/:id', isValidated, controller.previousJobsUser)
+
+
+userRoute.post('/payment/:id', isValidated, controller.payment)
+userRoute.post('/paymentSuccess/:id', isValidated, controller.paymentSuccess)
+
 
 export default userRoute;
